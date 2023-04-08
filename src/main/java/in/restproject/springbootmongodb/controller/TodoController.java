@@ -29,12 +29,6 @@ public class TodoController {
     @Autowired
     private TodoService todoService;
 
-    @GetMapping("/todos")
-    public ResponseEntity<?> getAllTodos() {
-        List<TodoDTO> todos = todoService.getAllTodos();
-        return new ResponseEntity<>(todos, todos.size() > 0 ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-    }
-
     @PostMapping("/todos")
     public ResponseEntity<?> createTodo(@RequestBody TodoDTO todo) {
         try {
@@ -47,13 +41,18 @@ public class TodoController {
         }
     }
 
+    @GetMapping("/todos")
+    public ResponseEntity<?> getAllTodos() {
+        List<TodoDTO> todos = todoService.getAllTodos();
+        return new ResponseEntity<>(todos, todos.size() > 0 ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
     @GetMapping("/todos/{id}")
     public ResponseEntity<?> getSingleTodo(@PathVariable("id") String id) {
-        Optional<TodoDTO> todoOptional = todoRepo.findById(id);
-        if (todoOptional.isPresent()) {
-            return new ResponseEntity<>(todoOptional.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Todo not found with id" + id, HttpStatus.NOT_FOUND);
+        try {
+            return new ResponseEntity<>(todoService.getSingleTodo(id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 

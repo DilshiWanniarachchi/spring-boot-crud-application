@@ -7,6 +7,7 @@ import in.restproject.springbootmongodb.model.TodoDTO;
 import jakarta.validation.ConstraintViolationException;
 
 public interface TodoService {
-    public List<TodoDTO> getAllTodos();
     public void createTodo(TodoDTO todo) throws ConstraintViolationException, TodoCollectionException; 
+    public List<TodoDTO> getAllTodos();
+    public TodoDTO getSingleTodo(String id) throws TodoCollectionException;
 }

@@ -20,6 +20,17 @@ public class TodoServiceImpl implements TodoService {
     private TodoRepository todoRepo;
 
     @Override
+    public void createTodo(TodoDTO todo) throws ConstraintViolationException, TodoCollectionException{
+        Optional<TodoDTO> todoOptional = todoRepo.findByTodo(todo.getTodo());
+        if (todoOptional.isPresent()) {
+            throw new TodoCollectionException(TodoCollectionException.TOdoAlreadyExists());
+        } else {
+            todo.setCreatedAt(new Date(System.currentTimeMillis()));
+            todoRepo.save(todo);
+        }
+    }
+
+    @Override
     public List<TodoDTO> getAllTodos() {
         List<TodoDTO> todos = todoRepo.findAll();
         if (todos.size() > 0) {
@@ -30,13 +41,12 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public void createTodo(TodoDTO todo) throws ConstraintViolationException, TodoCollectionException{
-        Optional<TodoDTO> todoOptional = todoRepo.findByTodo(todo.getTodo());
-        if (todoOptional.isPresent()) {
-            throw new TodoCollectionException(TodoCollectionException.TOdoAlreadyExists());
-        } else {
-            todo.setCreatedAt(new Date(System.currentTimeMillis()));
-            todoRepo.save(todo);
+    public TodoDTO getSingleTodo(String id) throws TodoCollectionException {
+        Optional<TodoDTO> optionalTodo = todoRepo.findById(id);
+        if (!optionalTodo.isPresent()) {
+            throw new TodoCollectionException(TodoCollectionException.NotFoundException(id));
+        }else {
+            return optionalTodo.get();
         }
     }
     
