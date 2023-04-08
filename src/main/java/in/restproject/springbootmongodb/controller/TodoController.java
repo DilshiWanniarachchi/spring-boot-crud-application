@@ -16,12 +16,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import in.restproject.springbootmongodb.repository.TodoRepository;
+import in.restproject.springbootmongodb.service.TodoService;
+import jakarta.validation.ConstraintViolationException;
+import in.restproject.springbootmongodb.exception.TodoCollectionException;
 import in.restproject.springbootmongodb.model.TodoDTO;
 
 @RestController
 public class TodoController {
     @Autowired
     private TodoRepository todoRepo;
+
+    @Autowired
+    private TodoService todoService;
 
     @GetMapping("/todos")
     public ResponseEntity<?> getAllTodos() {
@@ -36,11 +42,12 @@ public class TodoController {
     @PostMapping("/todos")
     public ResponseEntity<?> createTodo(@RequestBody TodoDTO todo) {
         try {
-            todo.setCreatedAt(new Date(System.currentTimeMillis()));
-            todoRepo.save(todo);
+            todoService.createTodo(todo);
             return new ResponseEntity<TodoDTO>(todo, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ConstraintViolationException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+        } catch (TodoCollectionException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
