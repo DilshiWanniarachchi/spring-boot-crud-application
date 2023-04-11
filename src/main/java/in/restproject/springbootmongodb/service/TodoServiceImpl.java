@@ -23,7 +23,7 @@ public class TodoServiceImpl implements TodoService {
     public void createTodo(TodoDTO todo) throws ConstraintViolationException, TodoCollectionException{
         Optional<TodoDTO> todoOptional = todoRepo.findByTodo(todo.getTodo());
         if (todoOptional.isPresent()) {
-            throw new TodoCollectionException(TodoCollectionException.TOdoAlreadyExists());
+            throw new TodoCollectionException(TodoCollectionException.TodoAlreadyExists());
         } else {
             todo.setCreatedAt(new Date(System.currentTimeMillis()));
             todoRepo.save(todo);
@@ -48,6 +48,31 @@ public class TodoServiceImpl implements TodoService {
         }else {
             return optionalTodo.get();
         }
+    }
+
+    @Override
+    public void updateTodo(String id, TodoDTO todo) throws TodoCollectionException {
+        Optional<TodoDTO> todoWithId = todoRepo.findById(id);
+
+        Optional<TodoDTO> todoWithSameName = todoRepo.findByTodo(todo.getTodo());
+
+        if (todoWithId.isPresent()) {
+
+            if (todoWithSameName.isPresent() && !todoWithSameName.get().getId().equals(id)) {
+                throw new TodoCollectionException(TodoCollectionException.TodoAlreadyExists());
+            }
+
+            TodoDTO todoToUpdate = todoWithId.get();
+
+            todoToUpdate.setTodo(todo.getTodo());
+            todoToUpdate.setDescription(todo.getDescription());
+            todoToUpdate.setCompleted(todo.getCompleted());
+            todoToUpdate.setUpdatedAt(new Date(System.currentTimeMillis()));
+            todoRepo.save(todoToUpdate);
+        } else {
+            throw new TodoCollectionException(TodoCollectionException.NotFoundException(id));
+        }
+
     }
     
 }

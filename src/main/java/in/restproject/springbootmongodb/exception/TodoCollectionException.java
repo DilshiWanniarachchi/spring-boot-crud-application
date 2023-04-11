@@ -15,7 +15,7 @@ public class TodoCollectionException extends Exception {
         return "Todo with id" + id + " not found!";
     }
 
-    public static String TOdoAlreadyExists() {
+    public static String TodoAlreadyExists() {
         return "Todo with given name already exists!";
     }
 }
